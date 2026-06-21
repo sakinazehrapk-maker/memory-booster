@@ -1,4 +1,8 @@
 let currentNumber = "";
+let score = 0;
+let level = 1;
+let streak = 0;
+let currentNumber = "";
 let gameActive = false;
 
 function startNumberGame() {
@@ -7,8 +11,8 @@ function startNumberGame() {
   gameActive = true;
   gameArea.innerHTML = "";
 
-  currentNumber = generateNumber(5);
-
+  let digits=4+level;
+  currentNumber=generateNumber(digits);
   gameArea.innerHTML = `
     <h2>Memorize this number:</h2>
     <h1 id="numberDisplay">${currentNumber}</h1>
@@ -25,25 +29,38 @@ function startNumberGame() {
 function checkAnswer() {
   const userValue = document.getElementById("userInput").value;
   const gameArea = document.getElementById("gameArea");
-
   if (userValue === currentNumber) {
+    score += 10;
+    streak += 1;
+    if (streak % 3 === 0) {
+      level++;
+    }
+    updateStats();
     gameArea.innerHTML = `
       <h2>Correct!</h2>
-      <p>You have a strong memory</p>
-      <button onclick="startNumberGame()">Play Again</button>
+      <p>+10 points</p>
+      <button onclick="startNumberGame()">Next Round</button>
     `;
   } else {
+    streak = 0;
+    updateStats();
     gameArea.innerHTML = `
       <h2>Wrong!</h2>
-      <p>Correct was: ${currentNumber}</p>
+      <p>The correct number was:</p>
+      <h3>${currentNumber}</h3>
       <button onclick="startNumberGame()">Try Again</button>
     `;
   }
 }
-function generateNumber(length) {
+function generateNumber(length){
   let num = "";
   for (let i = 0; i < length; i++) {
     num += Math.floor(Math.random() * 10);
   }
   return num;
+}
+function updateStats() {
+  document.getElementById("score").textContent = score;
+  document.getElementById("level").textContent = level;
+  document.getElementById("streak").textContent = streak;
 }

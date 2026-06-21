@@ -31,3 +31,14 @@ button:hover {
   margin-top: 30px;
   font-size: 1.5rem;
 }
+#stats {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin: 20px 0;
+}
+#stats h3 {
+  background: #1e293b;
+  padding: 10px 15px;
+  border-radius: 10px;
+}
