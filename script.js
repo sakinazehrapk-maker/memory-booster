@@ -2,8 +2,21 @@ let currentNumber = "";
 let score = 0;
 let level = 1;
 let streak = 0;
-let currentNumber = "";
 let gameActive = false;
+const words=[
+  "apple",
+  "river",
+  "tiger",
+  "moon",
+  "ocean",
+  "flower",
+  "castle",
+  "forest",
+  "rocket",
+  "mountain"
+];
+let currentWords=[];
+let wordLevel=1;
 
 function startNumberGame() {
   const gameArea = document.getElementById("gameArea");
@@ -144,4 +157,69 @@ function losePatternGame() {
     <p>Try Again</p>
     <button onclick="startPatternGame()">Play Again</button>
   `;
+}
+function startWordGame(){
+  const gameArea=document.getElementById("gameArea");
+  currentWords=[];
+  const numberOfWords=2+wordLevel;
+  while (currentWords.length<numberOfWords){
+    const randomWord=
+      words[Math.floor(Math.random()*words.length)];
+    if (!currentWords.includes(randomWord)){
+      currentWords.push(randomWord);
+    }
+  }
+  gameArea.innerHTML=`
+    <h2>Memorize These Words</h2>
+    <h1>${currentWords.join(" ")}</h1>
+  `;
+  setTimeout(()=>{
+    gameArea.innerHTML= `
+      <h2>Type the words in order</h2>
+      <input
+        type="text"
+        id="wordInput"
+        placeholder="Enter words separated by spaces"
+      >
+      <button onclick="checkWordAnswer()">
+        Submit
+      </button>
+    `;
+  }, 5000);
+}
+function checkWordAnswer(){
+  const userInput=
+    document.getElementById("wordInput")
+      .value
+      .trim()
+      .toLowerCase();
+  const correctAnswer=
+    currentWords.join(" ").toLowerCase();
+  const gameArea=
+    document.getElementById("gameArea");
+  if (userInput===correctAnswer){
+    score+=20;
+    streak++;
+    wordLevel++;
+    updateStats();
+    gameArea.innerHTML= `
+      <h2>Correct!</h2>
+      <p>+20 Points</p>
+      <p>Word Level: ${wordLevel}</p>
+      <button onclick="startWordGame()">
+        Next Round
+      </button>
+    `;
+  }else{
+    streak=0;
+    updateStats();
+    gameArea.innerHTML= `
+      <h2>Wrong!</h2>
+      <p>Correct Answer:</p>
+      <h3>${correctAnswer}</h3>
+      <button onclick="startWordGame()">
+        Try Again
+      </button>
+    `;
+  }
 }
