@@ -42,3 +42,21 @@ button:hover {
   padding: 10px 15px;
   border-radius: 10px;
 }
+.grid {
+  width: 320px;
+  margin: 20px auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.cell {
+  width: 100px;
+  height: 100px;
+  background: #334155;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.active {
+  background: #38bdf8;
+}
