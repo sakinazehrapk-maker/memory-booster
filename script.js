@@ -17,6 +17,10 @@ const words=[
 ];
 let currentWords=[];
 let wordLevel=1;
+let timer=60;
+let timerInterval=null;
+let timerMode=false;
+loadProgress();
 
 function startNumberGame() {
   const gameArea = document.getElementById("gameArea");
@@ -48,7 +52,9 @@ function checkAnswer() {
     if (streak % 3 === 0) {
       level++;
     }
+    if (timerMode && userValue === currentNumber) {score += 5;}
     updateStats();
+    saveProgress();
     gameArea.innerHTML = `
       <h2>Correct!</h2>
       <p>+10 points</p>
@@ -57,6 +63,7 @@ function checkAnswer() {
   }else{
     streak=0;
     updateStats();
+    saveProgress();
     gameArea.innerHTML = `
       <h2>Wrong!</h2>
       <p>The correct number was:</p>
@@ -107,7 +114,6 @@ function showPattern(){
   pattern.forEach((index, step)=>{
     setTimeout(()=>{
       cells[index].classList.add("active");
-
       setTimeout(()=>{
         cells[index].classList.remove("active");
       },500);
@@ -142,16 +148,19 @@ function winPatternGame(){
   score+=15;
   streak++;
   patternLevel++;
+  if (timerMode && userValue === currentNumber) {score += 5;}
   updateStats();
+  saveProgress();
   document.getElementById("gameArea").innerHTML = `
     <h2>Correct Pattern!</h2>
     <p>Next level: ${patternLevel}</p>
     <button onclick="startPatternGame()">Next Round</button>
   `;
 }
-function losePatternGame() {
+function losePatternGame(){
   streak=0;
   updateStats();
+  saveProgress();
   document.getElementById("gameArea").innerHTML = `
     <h2>Wrong Pattern</h2>
     <p>Try Again</p>
@@ -201,7 +210,9 @@ function checkWordAnswer(){
     score+=20;
     streak++;
     wordLevel++;
+    if (timerMode && userValue === currentNumber) {score += 5;}
     updateStats();
+    saveProgress();
     gameArea.innerHTML= `
       <h2>Correct!</h2>
       <p>+20 Points</p>
@@ -213,6 +224,7 @@ function checkWordAnswer(){
   }else{
     streak=0;
     updateStats();
+    saveProgress();
     gameArea.innerHTML= `
       <h2>Wrong!</h2>
       <p>Correct Answer:</p>
@@ -222,4 +234,78 @@ function checkWordAnswer(){
       </button>
     `;
   }
+}
+function loadProgress(){
+  const saved=JSON.parse(localStorage.getItem("memoryBooster"));
+  if (saved){
+    score = saved.score||0;
+    level = saved.level||1;
+    streak = saved.streak||0;
+    patternLevel = saved.patternLevel||3;
+    wordLevel = saved.wordLevel||1;
+  }
+  updateStats();
+}
+function saveProgress(){
+  const data={
+    score,
+    level,
+    streak,
+    patternLevel,
+    wordLevel
+  };
+  localStorage.setItem("memoryBooster", JSON.stringify(data));
+}
+function resetProgress(){
+  localStorage.removeItem("memoryBooster");
+  score=0;
+  level=1;
+  streak=0;
+  patternLevel=3;
+  wordLevel = 1;
+  updateStats();
+  document.getElementById("gameArea").innerHTML =
+    "<h2>Progress Reset</h2>";
+}
+function startTimerMode(){
+  timerMode=true;
+  timer=60;
+  updateTimerDisplay();
+  timerInterval=setInterval(()=>{
+    timer--;
+    updateTimerDisplay();
+    if (timer<=0){
+      endTimerMode();
+    }
+  }, 1000);
+}
+function updateTimerDisplay(){
+  document.getElementById("timer").textContent=timer;
+}
+function endTimerMode(){
+  clearInterval(timerInterval);
+  timerMode=false;
+  document.getElementById("gameArea").innerHTML = `
+    <h2>⏱Time's Up!</h2>
+    <p>Final Score: ${score}</p>
+    <p>Level Reached: ${level}</p>
+    <button onclick="resetTimerMode()">
+      Play Again
+    </button>
+  `;
+}
+function resetTimerMode(){
+  score=0;
+  level=1;
+  streak=0;
+  updateStats();
+  startTimerMode();
+}
+function startHardcoreMode(){
+  score=0;
+  level=1;
+  streak=0;
+  updateStats();
+  startTimerMode();
+  startNumberGame();
 }
