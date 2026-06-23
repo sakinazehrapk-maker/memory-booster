@@ -34,6 +34,8 @@ const colors=[
   "green",
   "yellow"
 ];
+let reactionStartTime=0;
+let waitingForClick=false;
 loadProgress();
 
 function startNumberGame() {
@@ -447,6 +449,73 @@ function loseColorGame(){
     <p>Correct Sequence:</p>
     <h3>${colorSequence.join(" ")}</h3>
     <button onclick="startColorGame()">
+      Try Again
+    </button>
+  `;
+}
+function startReactionGame() {
+
+  const gameArea = document.getElementById("gameArea");
+
+  waitingForClick = false;
+
+  gameArea.innerHTML = `
+    <h2>⚡ Wait for GREEN box...</h2>
+    <p>Click as fast as you can when it turns green</p>
+
+    <div id="reactionBox"
+      style="
+        width:200px;
+        height:200px;
+        background:red;
+        margin:20px auto;
+        border-radius:12px;
+        cursor:pointer;
+      "
+      onclick="handleReactionClick()"
+    ></div>
+  `;
+
+  let delay = Math.random() * 3000 + 1000;
+
+  setTimeout(() => {
+    const box = document.getElementById("reactionBox");
+
+    box.style.background = "green";
+
+    reactionStartTime = Date.now();
+    waitingForClick = true;
+
+  }, delay);
+}
+function handleReactionClick() {
+
+  const gameArea = document.getElementById("gameArea");
+
+  if (!waitingForClick) {
+    gameArea.innerHTML = `
+      <h2>❌ Too early!</h2>
+      <button onclick="startReactionGame()">Try Again</button>
+    `;
+    return;
+  }
+
+  let reactionTime = Date.now() - reactionStartTime;
+
+  score += Math.max(1, 1000 - reactionTime / 10);
+
+  streak++;
+
+  updateStats();
+  saveProgress();
+
+  waitingForClick = false;
+
+  gameArea.innerHTML = `
+    <h2>⚡ Your Reaction Time</h2>
+    <h1>${reactionTime} ms</h1>
+
+    <button onclick="startReactionGame()">
       Try Again
     </button>
   `;
