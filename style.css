@@ -60,3 +60,9 @@ button:hover {
 .active {
   background: #38bdf8;
 }
+.color-btn{
+  font-size: 2rem;
+  padding: 15px;
+  margin: 10px;
+  cursor: pointer;
+}

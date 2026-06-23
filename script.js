@@ -25,6 +25,15 @@ let mathLevel=1;
 let pattern=[];
 let userPattern=[];
 let patternLevel=3;
+let colorSequence=[];
+let userColorSequenc=[];
+let colorLevel=1;
+const colors=[
+  "red",
+  "blue",
+  "green",
+  "yellow"
+];
 loadProgress();
 
 function startNumberGame() {
@@ -354,4 +363,91 @@ function checkMathAnswer(){
       <button onclick="startMathGame()">Try Again</button>
     `;
   }
+}
+function startColorGame(){
+  colorSequence=[];
+  userColorSequence=[];
+  const gameArea=
+    document.getElementById("gameArea");
+  const length=2+colorLevel;
+  for (let i=0;i<length;i++){
+    colorSequence.push(
+      colors[Math.floor(Math.random()*colors.length)]
+    );
+  }
+  gameArea.innerHTML=`
+    <h2>Memorize This Sequence</h2>
+    <h1>${colorSequence.join(" ")}</h1>
+  `;
+  setTimeout(()=>{
+    showColorButtons();
+  }, 3000);
+}
+function showColorButtons(){
+  const gameArea=
+    document.getElementById("gameArea");
+  gameArea.innerHTML=`
+    <h2>Repeat the Sequence</h2>
+    <button class="color-btn red"
+      onclick="selectColor('red')">
+      🔴
+    </button>
+    <button class="color-btn blue"
+      onclick="selectColor('blue')">
+      🔵
+    </button>
+    <button class="color-btn green"
+      onclick="selectColor('green')">
+      🟢
+    </button>
+    <button class="color-btn yellow"
+      onclick="selectColor('yellow')">
+      🟡
+    </button>
+  `;
+}
+function selectColor(color){
+  userColorSequence.push(color);
+  const current=
+    userColorSequence.length-1;
+  if (
+    userColorSequence[current]!==
+    colorSequence[current]
+  ) {
+    loseColorGame();
+    return;
+  }
+  if (
+    userColorSequence.length===
+    colorSequence.length
+  ) {
+    winColorGame();
+  }
+}
+function winColorGame(){
+  score+=timerMode ? 10 : 15;
+  streak++;
+  colorLevel++;
+  updateStats();
+  saveProgress();
+  document.getElementById("gameArea").innerHTML=`
+    <h2>Correct Sequence!</h2>
+    <p>Color Level: ${colorLevel}</p>
+    <button onclick="startColorGame()">
+      Next Round
+    </button>
+  `;
+}
+function loseColorGame(){
+  streak=0;
+  updateStats();
+  saveProgress();
+  document.getElementById("gameArea").innerHTML=`
+    <h2>Wrong Sequence</h2>
+    <p>Correct Sequence:</p>
+    <h3>${colorSequence.join(" ")}</h3>
+    <button onclick="startColorGame()">
+      Try Again
+    </button>
+  `;
 }
