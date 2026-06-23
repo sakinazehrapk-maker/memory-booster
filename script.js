@@ -20,6 +20,11 @@ let wordLevel=1;
 let timer=60;
 let timerInterval=null;
 let timerMode=false;
+let mathAnswer=0;
+let mathLevel=1;
+let pattern=[];
+let userPattern=[];
+let patternLevel=3;
 loadProgress();
 
 function startNumberGame() {
@@ -84,9 +89,7 @@ function updateStats() {
   document.getElementById("level").textContent = level;
   document.getElementById("streak").textContent = streak;
 }
-let pattern=[];
-let userPattern=[];
-let patternLevel=3;
+
 function startPatternGame(){
   pattern=[];
   userPattern=[];
@@ -308,4 +311,47 @@ function startHardcoreMode(){
   updateStats();
   startTimerMode();
   startNumberGame();
+}
+function startMathGame(){
+  const gameArea=document.getElementById("gameArea");
+  const a=Math.floor(Math.random()*(10*mathLevel));
+  const b=Math.floor(Math.random()*(10*mathLevel));
+  const operations=["+","-","*"];
+  const op=operations[Math.floor(Math.random()*operations.length)];
+  if (op==="+")mathAnswer=a+b;
+  if (op==="-")mathAnswer=a-b;
+  if (op==="*")mathAnswer=a*b;
+  gameArea.innerHTML=`
+    <h2>Solve Quickly!</h2>
+    <h1>${a} ${op} ${b} = ?</h1>
+    <input id="mathInput" type="number" placeholder="Your answer">
+    <button onclick="checkMathAnswer()">Submit</button>
+  `;
+}
+function checkMathAnswer(){
+  const userValue=Number(document.getElementById("mathInput").value);
+  const gameArea=document.getElementById("gameArea");
+  if (userValue===mathAnswer){
+    score+=timerMode ? 5 : 10;
+    streak++;
+    if (streak%3===0){
+      mathLevel++;
+    }
+    updateStats();
+    saveProgress();
+    gameArea.innerHTML=`
+      <h2>Correct!</h2>
+      <p>Math Level: ${mathLevel}</p>
+      <button onclick="startMathGame()">Next Question</button>
+    `;
+  }else{
+    streak=0;
+    updateStats();
+    saveProgress();
+    gameArea.innerHTML=`
+      <h2>Wrong!</h2>
+      <p>Correct Answer: ${mathAnswer}</p>
+      <button onclick="startMathGame()">Try Again</button>
+    `;
+  }
 }
