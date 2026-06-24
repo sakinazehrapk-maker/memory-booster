@@ -66,3 +66,14 @@ button:hover {
   margin: 10px;
   cursor: pointer;
 }
+.diff-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 220px;
+  margin: auto;
+}
+.diff-cell{
+  font-size: 2rem;
+  padding: 15px;
+}

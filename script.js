@@ -36,6 +36,8 @@ const colors=[
 ];
 let reactionStartTime=0;
 let waitingForClick=false;
+let oddPosition=0;
+let differenceLevel=1;
 loadProgress();
 
 function startNumberGame() {
@@ -453,16 +455,12 @@ function loseColorGame(){
     </button>
   `;
 }
-function startReactionGame() {
-
-  const gameArea = document.getElementById("gameArea");
-
-  waitingForClick = false;
-
-  gameArea.innerHTML = `
-    <h2>⚡ Wait for GREEN box...</h2>
+function startReactionGame(){
+  const gameArea=document.getElementById("gameArea");
+  waitingForClick=false;
+  gameArea.innerHTML=`
+    <h2>Wait for GREEN box...</h2>
     <p>Click as fast as you can when it turns green</p>
-
     <div id="reactionBox"
       style="
         width:200px;
@@ -475,48 +473,103 @@ function startReactionGame() {
       onclick="handleReactionClick()"
     ></div>
   `;
-
-  let delay = Math.random() * 3000 + 1000;
-
-  setTimeout(() => {
+  let delay=Math.random()*3000+1000;
+  setTimeout(()=>{
     const box = document.getElementById("reactionBox");
-
-    box.style.background = "green";
-
-    reactionStartTime = Date.now();
-    waitingForClick = true;
-
+    box.style.background="green";
+    reactionStartTime=Date.now();
+    waitingForClick=true;
   }, delay);
 }
-function handleReactionClick() {
-
-  const gameArea = document.getElementById("gameArea");
-
-  if (!waitingForClick) {
-    gameArea.innerHTML = `
-      <h2>❌ Too early!</h2>
+function handleReactionClick(){
+  const gameArea=document.getElementById("gameArea");
+  if (!waitingForClick){
+    gameArea.innerHTML=`
+      <h2>Too early!</h2>
       <button onclick="startReactionGame()">Try Again</button>
     `;
     return;
   }
-
-  let reactionTime = Date.now() - reactionStartTime;
-
-  score += Math.max(1, 1000 - reactionTime / 10);
-
+  let reactionTime=Date.now()-reactionStartTime;
+  score+=Math.max(1,1000-reactionTime/10);
   streak++;
-
   updateStats();
   saveProgress();
-
-  waitingForClick = false;
-
-  gameArea.innerHTML = `
-    <h2>⚡ Your Reaction Time</h2>
+  waitingForClick=false;
+  gameArea.innerHTML=`
+    <h2>Your Reaction Time</h2>
     <h1>${reactionTime} ms</h1>
-
     <button onclick="startReactionGame()">
       Try Again
     </button>
   `;
+}
+function startSpotDifferenceGame(){
+  const gameArea=
+    document.getElementById("gameArea");
+  oddPosition=
+    Math.floor(Math.random()*9);
+  let gridHTML="";
+  for (let i=0;i<9;i++){
+    if (i === oddPosition) {
+      gridHTML += `<div class="diff-cell">🌟</div>`;
+    } else {
+      gridHTML += `<div class="diff-cell">⭐</div>`;
+    }
+  }
+  gameArea.innerHTML=`
+    <h2>Memorize the different star</h2>
+    <div class="diff-grid">
+      ${gridHTML}
+    </div>
+  `;
+  setTimeout(()=>{
+    showDifferenceSelection();
+  }, 4000);
+}
+function showDifferenceSelection(){
+  const gameArea=
+    document.getElementById("gameArea");
+  let buttons = "";
+  for (let i=0;i<9;i++){
+    buttons+=`
+      <button
+        onclick="checkDifference(${i})">
+        ${i+1}
+      </button>
+    `;
+  }
+  gameArea.innerHTML=`
+    <h2>Where was the different star?</h2>
+    ${buttons}
+  `;
+}
+function checkDifference(position){
+  const gameArea=
+    document.getElementById("gameArea");
+  if (position===oddPosition){
+    score += timerMode ? 10 : 15;
+    streak++;
+    differenceLevel++;
+    updateStats();
+    saveProgress();
+    gameArea.innerHTML=`
+      <h2>Correct!</h2>
+      <button onclick="startSpotDifferenceGame()">
+        Next Round
+      </button>
+    `;
+  }else{
+    streak=0;
+    updateStats();
+    saveProgress();
+    gameArea.innerHTML = `
+      <h2>Wrong!</h2>
+      <p>Correct position:
+      ${oddPosition + 1}</p>
+      <button onclick="startSpotDifferenceGame()">
+        Try Again
+      </button>
+    `;
+  }
 }
