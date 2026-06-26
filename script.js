@@ -41,6 +41,16 @@ let differenceLevel=1;
 let cardValues=[];
 let flippedCards=[];
 let matchedPairs=0;
+const stroopColors=["red","blue","green","yellow"];
+let correctColor="";
+const shoppingItems=[
+    "Milk","Bread","Cheese","Eggs","Butter",
+    "Rice","Pasta","Apple","Banana","Orange",
+    "Chicken","Fish","Tomato","Potato","Juice",
+    "Coffee","Tea","Yogurt","Sugar","Salt"
+];
+let shoppingAnswer=[];
+let selectedShopping=[];
 loadProgress();
 
 function startNumberGame() {
@@ -646,4 +656,140 @@ function checkMatch(){
   }
   flippedCards=[];
   updateStats();
+}
+function startStroopGame(){
+    const gameArea=document.getElementById("gameArea");
+    const word=stroopColors[Math.floor(Math.random()*4)];
+    correctColor=stroopColors[Math.floor(Math.random()*4)];
+    gameArea.innerHTML=`
+        <h2>Select the TEXT color</h2>
+        <h1 style="color:${correctColor};font-size:60px;">
+            ${word.toUpperCase()}
+        </h1>
+        <div id="stroopButtons"></div>
+    `;
+    const buttons=document.getElementById("stroopButtons");
+    stroopColors.forEach(color=>{
+        buttons.innerHTML+=`
+            <button onclick="checkStroop('${color}')">
+                ${color.toUpperCase()}
+            </button>
+        `;
+    });
+}
+function checkStroop(choice){
+    const gameArea=document.getElementById("gameArea");
+    if(choice===correctColor){
+        score+=15;
+        streak++;
+        updateStats();
+        saveProgress();
+        gameArea.innerHTML=`
+            <h2>Correct!</h2>
+            <button onclick="startStroopGame()">
+                Next Round
+            </button>
+        `;
+    }else{
+        streak=0;
+        updateStats();
+        saveProgress();
+        gameArea.innerHTML=`
+            <h2>Wrong!</h2>
+            <p>The correct answer was
+            <b>${correctColor.toUpperCase()}</b></p>
+            <button onclick="startStroopGame()">
+                Try Again
+            </button>
+        `;
+    }
+}
+function startShoppingGame(){
+    shoppingAnswer=[];
+    selectedShopping=[];
+    const gameArea=document.getElementById("gameArea");
+    while(shoppingAnswer.length<5){
+        let item=shoppingItems[
+            Math.floor(Math.random()*shoppingItems.length)
+        ];
+        if(!shoppingAnswer.includes(item)){
+            shoppingAnswer.push(item);
+        }
+    }
+    gameArea.innerHTML=`
+        <h2>Remember this shopping list</h2>
+        <ul>
+            ${shoppingAnswer.map(item=>`<li>${item}</li>`).join("")}
+        </ul>
+    `;
+    setTimeout(showShoppingChoices,5000);
+}
+function showShoppingChoices(){
+    const gameArea=document.getElementById("gameArea");
+    let shuffled=[...shoppingItems];
+    shuffled.sort(()=>Math.random()-0.5);
+    gameArea.innerHTML=`
+        <h2>Select the original 5 items</h2>
+        <div id="shoppingGrid"></div>
+        <button onclick="checkShoppingGame()">
+            Submit
+        </button>
+    `;
+    const grid=document.getElementById("shoppingGrid");
+    shuffled.forEach(item=>{
+        grid.innerHTML+=`
+            <label>
+                <input
+                    type="checkbox"
+                    value="${item}"
+                    onchange="toggleShopping(this)"
+                >
+                ${item}
+            </label><br>
+        `;
+    });
+}
+function toggleShopping(box){
+    if(box.checked){
+        selectedShopping.push(box.value);
+    }else{
+        selectedShopping=
+            selectedShopping.filter(
+                item=>item!==box.value
+            );
+    }
+}
+function checkShoppingGame(){
+    const gameArea=document.getElementById("gameArea");
+    const correct=
+        shoppingAnswer.every(
+            item=>selectedShopping.includes(item)
+        ) &&
+        selectedShopping.length===shoppingAnswer.length;
+    if(correct){
+        score+=20;
+        streak++;
+        updateStats();
+        saveProgress();
+        gameArea.innerHTML=`
+            <h2>Great Memory!</h2>
+            <button onclick="startShoppingGame()">
+                Play Again
+            </button>
+        `;
+    }else{
+        streak=0;
+        updateStats();
+        saveProgress();
+        gameArea.innerHTML=`
+            <h2>Not Quite!</h2>
+            <p>The correct list was:</p>
+            <ul>
+                ${shoppingAnswer.map(item=>`<li>${item}</li>`).join("")}
+            </ul>
+            <button onclick="startShoppingGame()">
+                Try Again
+            </button>
+        `;
+    }
 }
