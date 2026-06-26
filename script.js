@@ -38,6 +38,9 @@ let reactionStartTime=0;
 let waitingForClick=false;
 let oddPosition=0;
 let differenceLevel=1;
+let cardValues=[];
+let flippedCards=[];
+let matchedPairs=0;
 loadProgress();
 
 function startNumberGame() {
@@ -572,4 +575,75 @@ function checkDifference(position){
       </button>
     `;
   }
+}
+function startCardMatchGame(){
+  const gameArea=
+    document.getElementById("gameArea");
+  matchedPairs=0;
+  flippedCards=[];
+  cardValues=[
+    "🐱","🐱",
+    "🐶","🐶",
+    "🐸","🐸",
+    "🦊","🦊"
+  ];
+  cardValues.sort(()=>Math.random()-0.5);
+  gameArea.innerHTML=`
+    <h2>Match the Pairs</h2>
+    <div id="cardGrid" class="card-grid">
+      ${cardValues.map((_, index)=> `
+        <div
+          class="card"
+          onclick="flipCard(${index})"
+          id="card-${index}"
+        >
+          ❓
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+function flipCard(index){
+  if (flippedCards.length>=2){
+    return;
+  }
+  const card = document.getElementById(`card-${index}`);
+  if (flippedCards.includes(index)){
+    return;
+  }
+  card.textContent=cardValues[index];
+  flippedCards.push(index);
+  if (flippedCards.length===2){
+    setTimeout(checkMatch, 700);
+  }
+}
+function checkMatch(){
+  const [first, second]=
+    flippedCards;
+  const firstCard=
+    document.getElementById(`card-${first}`);
+  const secondCard=
+    document.getElementById(`card-${second}`);
+  if (
+    cardValues[first]===
+    cardValues[second]
+  ) {
+    matchedPairs++;
+    score+=5;
+    if (matchedPairs===4){
+      score+=20;
+      streak++;
+      updateStats();
+      saveProgress();
+      document.getElementById("gameArea")
+        .innerHTML+= `
+          <h2>All Pairs Found!</h2>
+        `;
+    }
+  }else{
+    firstCard.textContent = "❓";
+    secondCard.textContent = "❓";
+  }
+  flippedCards=[];
+  updateStats();
 }

@@ -77,3 +77,19 @@ button:hover {
   font-size: 2rem;
   padding: 15px;
 }
+.card-grid{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  width: 320px;
+  margin: auto;
+}
+
+.card{
+  background: #1e293b;
+  padding: 20px;
+  font-size: 2rem;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+}
