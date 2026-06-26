@@ -793,3 +793,30 @@ function checkShoppingGame(){
         `;
     }
 }
+function startDailyChallenge(){
+    const games=[
+        startNumberGame,
+        startPatternGame,
+        startWordGame,
+        startMathGame,
+        startReactionGame,
+        startSpotDifferenceGame,
+        startCardMatchGame,
+        startShoppingGame
+    ];
+    const today=new Date().toDateString();
+    let savedDate=localStorage.getItem("challengeDate");
+    let savedGame=localStorage.getItem("challengeGame");
+    let gameIndex;
+    if(savedDate===today){
+        gameIndex=Number(savedGame);
+    }else{
+        gameIndex=Math.floor(Math.random()*games.length);
+        localStorage.setItem("challengeDate",today);
+        localStorage.setItem("challengeGame",gameIndex);
+    }
+    games[gameIndex]();
+}
+if(localStorage.getItem("challengeDate")===new Date().toDateString()){
+    score += 50;
+}
